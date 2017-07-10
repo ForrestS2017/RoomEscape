@@ -24,11 +24,17 @@ public:
 	// Ray-cast and grab what's in reach
 	void Grab();
 	void Release();
+	
+	//Return hit for first physics body in reach
+	const FHitResult GetFirstPhysicsBodyInReach();
+
+	//Distance line trace should reach
+	UPROPERTY(EditAnywhere)
+	float reach = 200.0f;
 
 private:
 
-	//Distance line trace should reach
-	float reach = 100.0f;
+	
 
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 
@@ -37,6 +43,8 @@ private:
 	//BeginPlay Setups
 	void FindPhysicsHandleComponent();
 	void SetupAttatchedInputComponent();
+
+	FVector GetLineReachEnd();
 
 	
 };
