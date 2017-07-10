@@ -21,7 +21,7 @@ void UOpenDoor::BeginPlay()
 	Super::BeginPlay();
 
 	Owner = GetOwner();
-
+	openingActor = GetWorld()->GetFirstPlayerController()->GetPawn();
 	
 	// ...
 	
@@ -32,16 +32,37 @@ void UOpenDoor::BeginPlay()
 void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
-	openDoor(DeltaTime);
-	// ...
+	// Poll the Trigger Volume every frame
+	if (pressurePlate->IsOverlappingActor(openingActor))
+	{
+		// If the openingActor is in the volume
+		openDoor(DeltaTime);
+		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+	}
+	
+	if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime >= DoorCloseDelay)
+	{
+		closeDoor(DeltaTime);
+	}
+	
+	
+	/*else {
+		closeDoor(DeltaTime);
+	}*/
+	
+	
 }
 
 void UOpenDoor::openDoor(float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Opening Door"));
-	FRotator NewRotation = FRotator(0.0f, 60.0f, 0.0f)*FMath::Sin(GetWorld()->TimeSeconds);
-	//float NewRotation = 60.0f*FMath::Sin(DeltaTime);
+	float openRoll = FMath::Clamp((Owner->GetActorRotation().Yaw - 1.0f), openAngle, 0.f);
+	FRotator NewRotation = FRotator(0.0f, openRoll, 0.0f);
+	Owner->SetActorRotation(NewRotation);
+}
 
-	UE_LOG(LogTemp, Warning, TEXT("Opening Door %s"), *(NewRotation.ToString()));
+void UOpenDoor::closeDoor(float DeltaTime)
+{
+	float openRoll = FMath::Clamp((Owner->GetActorRotation().Yaw + 1.0f), openAngle, 0.f);
+	FRotator NewRotation = FRotator(0.0f, openRoll, 0.0f);
 	Owner->SetActorRotation(NewRotation);
 }
