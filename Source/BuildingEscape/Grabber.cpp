@@ -32,7 +32,7 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 	//If physics handle is attatched
 	
 	FVector LineTraceEnd = GetLineReachEnd();
-
+	if (!PhysicsHandle) return;
 	if (PhysicsHandle->GrabbedComponent)
 	{
 		// move the object that we're holding
@@ -56,6 +56,7 @@ void UGrabber::Grab()
 
 	if (ActorHit) {
 		// Attatch Physcis Handle
+		if (!PhysicsHandle) return;
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
 			ComponentToGrab, NAME_None, ComponentToGrab->GetOwner()->GetActorLocation(), ComponentToGrab->GetOwner()->GetActorRotation());
 	}

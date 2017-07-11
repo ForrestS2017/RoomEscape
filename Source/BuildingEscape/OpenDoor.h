@@ -5,6 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "OpenDoor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpenRequest);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BUILDINGESCAPE_API UOpenDoor : public UActorComponent
@@ -24,12 +25,15 @@ public:
 	void openDoor(float DeltaTime);
 	void closeDoor(float DeltaTime);
 
+	UPROPERTY(BlueprintAssignable)
+		FOnOpenRequest OnOpenRequest;
+
 private:
 
-	AActor* Owner;
+	AActor* Owner = nullptr;
 
 	UPROPERTY(EditAnywhere)
-		ATriggerVolume* pressurePlate;
+		ATriggerVolume* pressurePlate = nullptr;
 
 	UPROPERTY(EditAnywhere)
 		float openAngle = -90.0f;

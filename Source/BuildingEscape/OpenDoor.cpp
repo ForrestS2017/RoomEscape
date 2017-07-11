@@ -21,6 +21,10 @@ void UOpenDoor::BeginPlay()
 	Super::BeginPlay();
 
 	Owner = GetOwner();
+
+	if (!pressurePlate) {
+		UE_LOG(LogTemp, Error, TEXT("No pressure Plate: %s"), *Owner->GetName());
+	}
 	
 	// ...
 	
@@ -34,7 +38,7 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 	
 	
 	// Poll the Trigger Volume every frame to check for WEIGHT mass
-	if (GetTotalMassOnPlate() > 50.0f)
+	if (GetTotalMassOnPlate() > triggerMass)
 	{
 		// If the openingActor is in the volume
 		openDoor(DeltaTime);
@@ -56,15 +60,16 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 
 void UOpenDoor::openDoor(float DeltaTime)
 {
-	float openRoll = FMath::Clamp((Owner->GetActorRotation().Yaw - 1.0f), openAngle, 0.f);
-	FRotator NewRotation = FRotator(0.0f, openRoll, 0.0f);
-	Owner->SetActorRotation(NewRotation);
+	/*float openRoll = FMath::Clamp((Owner->GetActorRotation().Yaw - 1.0f), openAngle, 0.f);
+	FRotator NewRotation = FRotator(0.0f, openAngle, 0.0f);
+	Owner->SetActorRotation(NewRotation);*/
+	OnOpenRequest.Broadcast();
 }
 
 void UOpenDoor::closeDoor(float DeltaTime)
 {
-	float openRoll = FMath::Clamp((Owner->GetActorRotation().Yaw + 1.0f), openAngle, 0.f);
-	FRotator NewRotation = FRotator(0.0f, openRoll, 0.0f);
+	/*float openRoll = FMath::Clamp((Owner->GetActorRotation().Yaw + 1.0f), openAngle, 0.f);*/
+	FRotator NewRotation = FRotator(0.0f, 0.00, 0.0f);
 	Owner->SetActorRotation(NewRotation);
 }
 
@@ -75,6 +80,9 @@ float UOpenDoor::GetTotalMassOnPlate()
 	TArray<AActor*> OverlappingActors;
 
 	//Find all overlapping actors
+	if (!pressurePlate) { 
+		return 0.0f;
+	}
 	pressurePlate->GetOverlappingActors(OUT OverlappingActors);
 
 	//Iterate through and sum masses
