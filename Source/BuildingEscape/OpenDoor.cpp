@@ -40,38 +40,14 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 	// Poll the Trigger Volume every frame to check for WEIGHT mass
 	if (GetTotalMassOnPlate() > triggerMass)
 	{
-		// If the openingActor is in the volume
-		openDoor(DeltaTime);
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		OnOpen.Broadcast();
 	}
-	
-	if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime >= DoorCloseDelay)
+	else
 	{
-		closeDoor(DeltaTime);
+		OnClose.Broadcast();
 	}
-	
-	
-	/*else {
-		closeDoor(DeltaTime);
-	}*/
-	
-	
 }
 
-void UOpenDoor::openDoor(float DeltaTime)
-{
-	/*float openRoll = FMath::Clamp((Owner->GetActorRotation().Yaw - 1.0f), openAngle, 0.f);
-	FRotator NewRotation = FRotator(0.0f, openAngle, 0.0f);
-	Owner->SetActorRotation(NewRotation);*/
-	OnOpenRequest.Broadcast();
-}
-
-void UOpenDoor::closeDoor(float DeltaTime)
-{
-	/*float openRoll = FMath::Clamp((Owner->GetActorRotation().Yaw + 1.0f), openAngle, 0.f);*/
-	FRotator NewRotation = FRotator(0.0f, 0.00, 0.0f);
-	Owner->SetActorRotation(NewRotation);
-}
 
 float UOpenDoor::GetTotalMassOnPlate()
 {
